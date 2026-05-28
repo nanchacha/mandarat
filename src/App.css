@@ -97,10 +97,31 @@
   transform: rotate(180deg);
 }
 
+.sample-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary-color);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sample-button:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: translateY(-1px);
+}
+
 @media (prefers-color-scheme: dark) {
   .reset-button:hover {
     background: rgba(255, 255, 255, 0.1);
   }
+
 }
 
 .app-main {

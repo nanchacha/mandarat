@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useMandalart } from './hooks/useMandalart';
 import { MandalartGrid } from './components/MandalartGrid';
-import { Target, RefreshCw } from 'lucide-react';
+import { SampleModal } from './components/SampleModal';
+import { Target, RefreshCw, BookOpen } from 'lucide-react';
 import './App.css';
 
 function App() {
-  const { data, updateCell, progress, resetData, saveMessage } = useMandalart();
+  const { data, updateCell, toggleCellCompletion, progress, resetData, saveMessage } = useMandalart();
+  const [isSampleModalOpen, setIsSampleModalOpen] = useState(false);
 
   return (
     <div className="app-layout">
@@ -16,6 +18,10 @@ function App() {
             <h1>Mandalart Planner</h1>
           </div>
           <div className="header-actions">
+            <button className="sample-button" onClick={() => setIsSampleModalOpen(true)} title="오타니 샘플 보기">
+              <BookOpen size={18} />
+              <span>샘플 보기</span>
+            </button>
             <div className="save-message-container">
               <span className={`save-message ${saveMessage ? 'visible' : ''}`}>
                 {saveMessage}
@@ -39,12 +45,17 @@ function App() {
 
       <main className="app-main">
         <p className="subtitle">중앙에 핵심 목표를 적고, 주변으로 세부 목표와 실천 계획을 펼쳐보세요.</p>
-        <MandalartGrid data={data} updateCell={updateCell} />
+        <MandalartGrid data={data} updateCell={updateCell} toggleCellCompletion={toggleCellCompletion} />
       </main>
       
       <footer className="app-footer">
         <p>Built with React & Vite. Data is saved locally in your browser.</p>
       </footer>
+      
+      <SampleModal 
+        isOpen={isSampleModalOpen} 
+        onClose={() => setIsSampleModalOpen(false)} 
+      />
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const INITIAL_DATA = Array(9).fill(null).map(() => Array(9).fill(''));
+const INITIAL_DATA = Array(9).fill(null).map(() => 
+  Array(9).fill(null).map(() => ({ text: '', completed: false }))
+);
 const STORAGE_KEY = 'mandalart_data';
 
 export function useMandalart() {
@@ -8,7 +10,12 @@ export function useMandalart() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        // Migration from old string arrays to object arrays
+        return parsed.map(section => section.map(cell => {
+          if (typeof cell === 'string') return { text: cell, completed: false };
+          return cell || { text: '', completed: false };
+        }));
       }
     } catch (e) {
       console.error("Failed to load Mandalart data from local storage", e);
@@ -35,14 +42,15 @@ export function useMandalart() {
     }
   }, [data]);
 
-  // Update a specific cell
-  const updateCell = useCallback((sectionIndex, cellIndex, value) => {
+  // Update a specific cell's text
+  const updateCell = useCallback((sectionIndex, cellIndex, newText) => {
     setData((prev) => {
-      const newData = prev.map((section, sIdx) => 
-        sIdx === sectionIndex 
-          ? [...section.slice(0, cellIndex), value, ...section.slice(cellIndex + 1)]
-          : [...section]
-      );
+      const newData = prev.map(section => [...section]);
+      
+      newData[sectionIndex][cellIndex] = { 
+        ...newData[sectionIndex][cellIndex], 
+        text: newText 
+      };
 
       // Handle synchronization between center section and outer sections
       if (sectionIndex === 4) {
@@ -50,13 +58,19 @@ export function useMandalart() {
         if (cellIndex !== 4) {
           const targetSectionIndex = cellIndex; // 0-8 maps directly to the 9 sections
           newData[targetSectionIndex] = [...newData[targetSectionIndex]];
-          newData[targetSectionIndex][4] = value;
+          newData[targetSectionIndex][4] = { 
+            ...newData[targetSectionIndex][4], 
+            text: newText 
+          };
         }
       } else {
         // If editing the center cell of an outer section, update the corresponding cell in the center section
         if (cellIndex === 4) {
           newData[4] = [...newData[4]];
-          newData[4][sectionIndex] = value;
+          newData[4][sectionIndex] = { 
+            ...newData[4][sectionIndex], 
+            text: newText 
+          };
         }
       }
 
@@ -64,9 +78,19 @@ export function useMandalart() {
     });
   }, []);
 
-  // Calculate progress
-  // Progress can be defined as how many action items (non-center cells of non-center sections) are filled.
-  // There are 8 outer sections * 8 action cells = 64 action cells total.
+  // Toggle completion status of an action cell
+  const toggleCellCompletion = useCallback((sectionIndex, cellIndex) => {
+    setData((prev) => {
+      const newData = prev.map(section => [...section]);
+      newData[sectionIndex][cellIndex] = { 
+        ...newData[sectionIndex][cellIndex], 
+        completed: !newData[sectionIndex][cellIndex].completed 
+      };
+      return newData;
+    });
+  }, []);
+
+  // Calculate progress based on 'completed' status, not just text presence
   const calculateProgress = () => {
     let filledActions = 0;
     const totalActions = 64;
@@ -74,7 +98,7 @@ export function useMandalart() {
     data.forEach((section, sIdx) => {
       if (sIdx !== 4) { // Outer section
         section.forEach((cell, cIdx) => {
-          if (cIdx !== 4 && cell.trim() !== '') {
+          if (cIdx !== 4 && cell.completed) {
             filledActions++;
           }
         });
@@ -99,6 +123,7 @@ export function useMandalart() {
   return {
     data,
     updateCell,
+    toggleCellCompletion,
     progress,
     resetData,
     saveMessage

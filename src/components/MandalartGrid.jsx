@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MandalartSection } from './MandalartSection';
 import './MandalartGrid.css';
 
-export function MandalartGrid({ data, updateCell }) {
+export function MandalartGrid({ data, updateCell, toggleCellCompletion, readOnly }) {
   // null means show all 9 sections. Number 0-8 means focus on that specific section.
   const [focusedSection, setFocusedSection] = useState(null);
 
@@ -31,7 +31,7 @@ export function MandalartGrid({ data, updateCell }) {
       )}
       
       <motion.div 
-        className={`mandalart-grid ${focusedSection !== null ? 'has-focus' : ''}`}
+        className={`mandalart-grid ${focusedSection !== null ? 'has-focus' : ''} ${readOnly ? 'read-only-grid' : ''}`}
         layout
       >
         {data.map((sectionData, sectionIndex) => {
@@ -54,8 +54,10 @@ export function MandalartGrid({ data, updateCell }) {
                 sectionIndex={sectionIndex}
                 sectionData={sectionData}
                 updateCell={updateCell}
+                toggleCellCompletion={toggleCellCompletion}
                 onSectionClick={handleSectionClick}
                 isFocused={focusedSection === sectionIndex}
+                readOnly={readOnly}
               />
             </motion.div>
           );

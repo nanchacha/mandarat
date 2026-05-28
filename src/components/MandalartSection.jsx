@@ -1,7 +1,7 @@
 import React from 'react';
 import { MandalartCell } from './MandalartCell';
 
-export function MandalartSection({ sectionIndex, sectionData, updateCell, onSectionClick, isFocused }) {
+export function MandalartSection({ sectionIndex, sectionData, updateCell, toggleCellCompletion, onSectionClick, isFocused, readOnly }) {
   const isCenterSection = sectionIndex === 4;
 
   return (
@@ -13,10 +13,12 @@ export function MandalartSection({ sectionIndex, sectionData, updateCell, onSect
         <MandalartCell
           key={cellIndex}
           value={cellValue}
-          onChange={(value) => updateCell(sectionIndex, cellIndex, value)}
+          onChange={(value) => updateCell && updateCell(sectionIndex, cellIndex, value)}
+          onToggleComplete={() => toggleCellCompletion && toggleCellCompletion(sectionIndex, cellIndex)}
           isCenterSection={isCenterSection}
           isCenterCell={cellIndex === 4}
           isFocused={isFocused}
+          readOnly={readOnly}
         />
       ))}
     </div>
