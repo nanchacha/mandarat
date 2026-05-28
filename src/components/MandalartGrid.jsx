@@ -8,6 +8,9 @@ export function MandalartGrid({ data, updateCell, toggleCellCompletion, readOnly
   const [focusedSection, setFocusedSection] = useState(null);
 
   const handleSectionClick = (sectionIndex) => {
+    // 샘플(읽기 전용) 모드일 때는 클릭 줌을 막습니다.
+    if (readOnly) return;
+
     // Only allow focusing on mobile or narrow screens, managed mostly by CSS and click handlers.
     // If currently viewing all, zoom into the clicked section
     if (focusedSection === null) {

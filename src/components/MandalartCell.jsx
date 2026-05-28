@@ -34,8 +34,8 @@ export function MandalartCell({ value, onChange, onToggleComplete, isCenterSecti
   return (
     <motion.div 
       className={cellClass}
-      whileHover={{ scale: 1.02, zIndex: 10 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={readOnly ? {} : { scale: 1.02, zIndex: 10 }}
+      whileTap={readOnly ? {} : { scale: 0.98 }}
       onClick={onClick}
       layout
     >
